@@ -11,6 +11,7 @@ face_model = YOLO("models/yolov11m-face.pt").to("cuda")
 prev_time = time.perf_counter()
 
 CAMERA_INDEX = 0
+MAX_DISTANCE = 45
 
 cap = cv2.VideoCapture(CAMERA_INDEX)
 
@@ -54,6 +55,10 @@ while cv2.waitKey(1) != ord("x"):
         face = cv2.cvtColor(face, cv2.COLOR_BGR2GRAY)
         face = cv2.resize(face, (200, 200))
         label, distance = face_recognizer.predict(face)
+        if distance > MAX_DISTANCE:
+            name = "unknown"
+        else:
+            name = str(label)
         cv2.rectangle(
             processed_image,
             (left, top),
@@ -63,7 +68,7 @@ while cv2.waitKey(1) != ord("x"):
         )
         cv2.putText(
             processed_image,
-            str(label) + " | " + str(int(distance)) + " | track_id=" + str(int(track_id)),
+            name + " | " + str(int(distance)) + " | track_id=" + str(int(track_id)),
             (left, bottom + 20),
             cv2.FONT_HERSHEY_SIMPLEX,
             1,
